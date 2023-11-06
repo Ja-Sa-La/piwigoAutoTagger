@@ -2,7 +2,8 @@
 
 The program automatically creates tags for images using Deepbooru interrogator. 
 Example tags and image
-![image](https://github.com/Ja-Sa-La/piwigoAutoTagger/assets/133235384/ad6e9597-4581-45cc-ab24-ded16a256098)
+![image](https://github.com/Ja-Sa-La/piwigoAutoTagger/assets/133235384/7e2da1f2-8dc6-4097-8300-2b2337b79f54)
+
 
 
 # Requirements
