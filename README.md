@@ -1,5 +1,10 @@
-Tested with node 20.5.0
+#REQUIREMENTS
 
+[Nodejs](https://nodejs.org/en)
+[Piwigo](https://piwigo.org)
+[Automatic webUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
+
+#instructions
 
 1. fill in the details in Config.js 
 2. Run `npm install`
