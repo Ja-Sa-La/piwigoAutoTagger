@@ -34,9 +34,10 @@ async function processImage(image, cookies) {
             }
         });
 
-        const tags = apiResponse.data.caption.replaceAll(" ", "").split(",");
+        const tags = apiResponse.data.caption.split(",");
         let fulltags = '';
-        for (const tag of tags) {
+        for (let tag of tags) {
+            tag = tag.trim()
             const tagId = getTagIdByName(getTags.data, tag);
             if (tagId !== null) {
                 fulltags += tagId + ",";
