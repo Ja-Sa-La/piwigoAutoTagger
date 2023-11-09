@@ -6,8 +6,10 @@ import {CheckAll, CheckOnce, PiwigoAdminPassword, PiwigoAdminUsername, PiwigoURL
 
 async function processImage(image, cookies) {
     try {
-        const imagePath = image.path.replace("./", "");
-
+        let imagePath = image.path.replace("./", "");
+        if (image.representative_ext  == "jpg"){
+         imagePath = imagePath.replace(/(.*\/)([^/]+)\.([^/.]+)$/, '$1pwg_representative/$2.jpg');
+}
         const response = await axios.get(`https://${PiwigoURL}/${imagePath}`, {responseType: 'arraybuffer'});
         const imageData = Buffer.from(response.data, 'binary').toString('base64');
 
@@ -69,9 +71,9 @@ async function processImagesSequentially() {
     try {
         let output
         if (!CheckAll)
-            output = await query("SELECT * FROM piwiai_images img LEFT JOIN piwiai_image_tag tag ON img.id = tag.image_id WHERE tag.image_id IS NULL");
+            output = await query("SELECT * FROM piwigo_images img LEFT JOIN piwigo_image_tag tag ON img.id = tag.image_id WHERE tag.image_id IS NULL");
         else
-            output = await query("SELECT * FROM piwiai_images");
+            output = await query("SELECT * FROM piwigo_images");
         console.log("Updating tags on: " + output.length + " images")
         const Cookies = await Login(PiwigoAdminUsername, PiwigoAdminPassword)
 
