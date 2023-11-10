@@ -7,10 +7,13 @@ import {CheckAll, CheckOnce, PiwigoAdminPassword, PiwigoAdminUsername, PiwigoURL
 async function processImage(image, cookies) {
     try {
         let imagePath = image.path.replace("./", "");
-        if (image.representative_ext  == "jpg"){
+        const list = [ "ogv", "mp4", "m4v", "webm", "webmv", "strm"]
+        if (image.representative_ext  == "jpg" || list.includes(image.path.split(".").pop())){
          imagePath = imagePath.replace(/(.*\/)([^/]+)\.([^/.]+)$/, '$1pwg_representative/$2.jpg');
-}
+         console.log("VideoFile detected trying to find poster")
+        }
         const response = await axios.get(`https://${PiwigoURL}/${imagePath}`, {responseType: 'arraybuffer'});
+
         const imageData = Buffer.from(response.data, 'binary').toString('base64');
 
         const data = {
@@ -35,7 +38,12 @@ async function processImage(image, cookies) {
                 Cookie: Object.keys(cookies).map(cookieName => `${cookieName}=${cookies[cookieName]}`).join('; ')
             }
         });
-
+        apiResponse.data.caption = apiResponse.data.caption.replaceAll("+", " ");
+        if (apiResponse.data.caption == "")
+        {
+            console.log("ID: " + image.id + " | Unable to generate tags for image " + image.file)
+            return;
+        }
         const tags = apiResponse.data.caption.split(",");
         let fulltags = '';
         for (let tag of tags) {
@@ -62,8 +70,9 @@ async function processImage(image, cookies) {
                 Cookie: Object.keys(cookies).map(cookieName => `${cookieName}=${cookies[cookieName]}`).join('; ')
             }
         });
+        console.log("ID: " + image.id + " | new tags added | " + apiResponse.data.caption)
     } catch (error) {
-        console.error(`Error processing image ID ${image.id}:`, error); // Handle errors
+        console.log("ID: " + image.id + " | Unable to locate an image or poster " + image.file) // Handle errors
     }
 }
 
@@ -79,7 +88,6 @@ async function processImagesSequentially() {
 
         for await (const image of output) {
             await processImage(image, Cookies);
-            console.log("ID: " + image.id + " new tags added")
         }
         console.log("Done checking")
     } catch (error) {
