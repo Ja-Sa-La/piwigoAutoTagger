@@ -53,7 +53,11 @@ async function processImage(image, cookies) {
                 fulltags += tagId + ",";
             } else {
                 const tagCreateUrl = `https://${PiwigoURL}/ws.php?format=json&method=pwg.tags.add&name=${tag}`;
-                const createTag = await axios.get(tagCreateUrl);
+                const createTag = await axios.get(tagCreateUrl, {
+            headers: {
+                Cookie: Object.keys(cookies).map(cookieName => `${cookieName}=${cookies[cookieName]}`).join('; ')
+            }
+        });
                 fulltags += createTag.data.result.id + ",";
             }
         }
