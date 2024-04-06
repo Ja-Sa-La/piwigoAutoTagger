@@ -106,23 +106,31 @@ async function Login(username, password) {
     params.append('password', password);
 
     const LoginUrl = `https://${PiwigoURL}/ws.php?format=json`;
-
     const apiResponse = await axios.post(LoginUrl, params, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         }
     });
-    const pwgIdCookie = apiResponse.headers['set-cookie']
-        .find(cookie => cookie.startsWith('pwg_id'))
-        .split(';')[0]
-        .split('=')[1];
+    console.log(apiResponse.headers)
+    const pwgIdCookies = apiResponse.headers['set-cookie']
+        .filter(cookie => cookie.startsWith('pwg_id'))
+        .map(cookie => cookie.split(';')[0].split('=')[1]);
+    for (const cookie of pwgIdCookies) {
+        const params2 = new URLSearchParams();
+        params2.append('method', 'pwg.session.getStatus');
 
-    if (apiResponse.data.stat != "ok")
-        throw new Error('failed to login to piwigo');
-    else
-        console.log("Login successfull")
+        const apiResponse2 = await axios.post(`https://${PiwigoURL}/ws.php?format=json`, params2, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Cookie: "pwg_id="+ cookie
 
-    return {pwg_id: pwgIdCookie}
+            }
+        });
+        if (apiResponse2.data.result.status != "guest"){
+            return {pwg_id: cookie}
+        }
+    }
+    throw new Error('failed to login to piwigo');
 }
 
 
